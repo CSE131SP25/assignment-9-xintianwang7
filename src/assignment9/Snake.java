@@ -10,10 +10,15 @@ public class Snake {
 	private double deltaX;
 	private double deltaY;
 	
+	private double movementRate;
+	
 	public Snake() {
 		//FIXME - set up the segments instance variable
 		deltaX = 0;
 		deltaY = 0;
+		segments = new LinkedList<>();
+		segments.add(new BodySegment(0, 0, SEGMENT_SIZE));
+		//System.out.println("Snake initialized with " + segments.size() + " segment(s)");
 	}
 	
 	public void changeDirection(int direction) {
@@ -37,14 +42,21 @@ public class Snake {
 	 * based on the current direction of travel
 	 */
 	public void move() {
-		//FIXME
+		BodySegment head = segments.getFirst();
+		double updateX = head.getX() + deltaX;
+		double updateY = head.getY() + deltaY;
+		BodySegment updatedHead = new BodySegment(updateX, updateY, SEGMENT_SIZE);
+		segments.addFirst(updatedHead);
+		segments.removeLast();
 	}
 	
 	/**
 	 * Draws the snake by drawing each segment
 	 */
 	public void draw() {
-		//FIXME
+		for (BodySegment segments:segments) {
+			segments.draw();
+		}	
 	}
 	
 	/**
@@ -53,7 +65,23 @@ public class Snake {
 	 * @return true if the snake successfully ate the food
 	 */
 	public boolean eatFood(Food f) {
-		//FIXME
+		BodySegment head = segments.getFirst();
+		double distanceX = head.getX() - f.getX();
+		double distanceY = head.getY() - f.getY();
+		
+		double distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+		
+		movementRate = MOVEMENT_SIZE;
+		if (distance < SEGMENT_SIZE) {
+			double updateX = head.getX() + deltaX;
+			double updateY = head.getY() + deltaY;
+			BodySegment updatedHead = new BodySegment(updateX, updateY, SEGMENT_SIZE);
+			segments.addFirst(updatedHead);
+			
+			movementRate *= 0.95;
+			
+			return true;
+		}
 		return false;
 	}
 	
@@ -62,7 +90,14 @@ public class Snake {
 	 * @return whether or not the head is in the bounds of the window
 	 */
 	public boolean isInbounds() {
-		//FIXME
-		return true;
+		BodySegment head = segments.getFirst();
+		double x = head.getX();
+		double y = head.getY();
+		
+		if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
